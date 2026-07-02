@@ -18,7 +18,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd ~/DevOps-sandbox
+            cd ~/full_project
             git pull origin main
             docker image prune -f
             docker compose up --build -d
