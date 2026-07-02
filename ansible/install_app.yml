@@ -1,0 +1,40 @@
+---
+
+- name: Deploy Docker Project to AWS
+  hosts: new_servers
+  become: yes
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        force_apt_get: yes
+
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Install Docker Compose
+      apt:
+        name: docker-compose-v2
+        state: present
+
+    - name: Ensure Docker is running
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Copy project files to remote server
+      copy:
+        src: ../
+        dest: /home/ubuntu/app/
+        owner: ubuntu
+        group: ubuntu
+        mode: '0755'
+
+    - name: Run Docker Compose project
+      shell: "docker compose up --build -d"
+      args:
+        chdir: /home/ubuntu/app/

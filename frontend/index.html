@@ -1,12 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>DevOps Sandbox App</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script src="app.js"></script>
-  </body>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DevOps Sandbox Python App</title>
+</head>
+<body style="padding: 20px; font-family: Arial, sans-serif;">
+    <h1>DevOps Task Manager (Python Backend)</h1>
+    <form id="taskForm">
+        <input type="text" id="taskInput" placeholder="Enter a new task..." style="padding: 8px; margin-right: 10px;">
+        <button type="submit" style="padding: 8px 15px;">Add Task</button>
+    </form>
+    <ul id="taskList"></ul>
+
+    <script>
+        const API_URL = window.location.protocol + "//" + window.location.hostname + ":5000";
+        const taskForm = document.getElementById('taskForm');
+        const taskInput = document.getElementById('taskInput');
+        const taskList = document.getElementById('taskList');
+
+        function fetchTasks() {
+            fetch(`${API_URL}/api/tasks`)
+                .then(res => res.json())
+                .then(data => {
+                    taskList.innerHTML = '';
+                    data.forEach(task => {
+                        const li = document.createElement('li');
+                        li.textContent = task.title;
+                        li.style.margin = '5px 0';
+                        taskList.appendChild(li);
+                    });
+                })
+                .catch(err => console.error("Error fetching tasks:", err));
+        }
+
+        taskForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const title = taskInput.value.trim();
+            if (!title) return;
+
+            fetch(`${API_URL}/api/tasks`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: title })
+            })
+            .then(res => res.json())
+            .then(() => {
+                taskInput.value = '';
+                fetchTasks();
+            })
+            .catch(err => console.error("Error adding task:", err));
+        });
+
+        fetchTasks();
+    </script>
+</body>
 </html>
